@@ -3,3 +3,5 @@ keys.json
 init
 
 instance
+
+__pycache__
