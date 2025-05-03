@@ -147,9 +147,10 @@ def handle_expired_token(jwt_header,jwt_payload):
     response.delete_cookie("access_token_cookie")
     return response
 
-#TODO: Add persistence to database
+#TODO: Need to add Flask migrate
 #TODO: Password for mysql should be moved, maybe using environment variables
 #TODO: Commit tommorow changes
+#TODO: Structure of a project should be changed 
 if __name__ == "__main__":
     with app.app_context():
         #creating orm database
