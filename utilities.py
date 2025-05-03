@@ -49,5 +49,4 @@ def hashing_password(password):
     return bcrypt.hashpw(bytes,salt)
 
 def check_hash_password(password,hashed_password):
-    bytes = password.encode("utf-8")
-    return bcrypt.checkpw(bytes,hashed_password)
+    return bcrypt.checkpw(password.encode("utf-8"),hashed_password.encode("utf-8"))

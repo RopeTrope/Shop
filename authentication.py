@@ -1,5 +1,6 @@
-import os
+import time
 from flask import Flask, render_template, request, jsonify, redirect, make_response
+from sqlalchemy.exc import OperationalError
 from models import database
 from utilities import validation,login_validation,check_hash_password
 from databaseUtils import find_user_by_email,add_user_to_db,delete_user
@@ -17,8 +18,7 @@ with open('keys.json','r') as file:
 
 JWT_SECRET_KEY = secret_key
 #TODO: This config probably should be moved to another place
-db_path = os.path.join(os.getcwd(), 'instance', 'app.db')
-app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{db_path}'
+app.config["SQLALCHEMY_DATABASE_URI"] = f'mysql+pymysql://user:user@db:3306/Shop'
 #TODO: Key should be added in keys.json or something like that
 app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
@@ -28,8 +28,6 @@ jwt = JWTManager(app)
 
 #initialize database
 database.init_app(app)
-
-
 
 @app.route("/",methods=['GET'])
 def hello():
@@ -111,7 +109,7 @@ def login():
         claims = {
             "first_name":user_exists.first_name,
             "last_name":user_exists.last_name,
-            "password":user_exists.password.decode("utf-8"),
+            "password":user_exists.password,
             "role":user_exists.role
                    }
         token = create_access_token(identity=email, additional_claims=claims)
@@ -149,12 +147,17 @@ def handle_expired_token(jwt_header,jwt_payload):
     response.delete_cookie("access_token_cookie")
     return response
 
-
-#TODO : Need to add database from docker in order to create new users
-#Now it can be used in dbbrowser because its sqlite
-#TODO: Next time this should be done
+#TODO: Add persistence to database
+#TODO: Password for mysql should be moved, maybe using environment variables
+#TODO: Commit tommorow changes
 if __name__ == "__main__":
     with app.app_context():
         #creating orm database
-        database.create_all()
-    app.run(debug=True)
+        created = False
+        while created is False:
+            try:
+                database.create_all()
+                created = True
+            except OperationalError:
+                time.sleep(3) 
+    app.run(debug=True, host="0.0.0.0")

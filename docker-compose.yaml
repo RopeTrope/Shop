@@ -1,2 +1,26 @@
+version: '3.1'
+
 services:
   
+  adminer:
+    image: adminer
+    ports:
+        - 8080:8080
+
+
+  db:
+    image: mysql
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: Shop
+        MYSQL_USER: user
+        MYSQL_PASSWORD: user
+    ports:
+        - 3306:3306
+
+  authentication:
+    image: authen
+    ports:
+        - 5000:5000
+    depends_on:
+        - db
