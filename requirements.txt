@@ -4,3 +4,4 @@ pymysql
 flask-jwt-extended
 bcrypt
 cryptography
+Flask-Migrate

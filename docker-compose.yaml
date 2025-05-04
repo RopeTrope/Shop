@@ -24,8 +24,16 @@ services:
     image: authen
     ports:
         - 5000:5000
+    volumes:
+      - migrations-data:/usr/local/app/migrations
     depends_on:
         - db
+    command: sh -c "/wait && /sayhello"
+    environment:
+      - WAIT_HOSTS=3306
+      - WAIT_HOSTS_TIMEOUT=60
+      - WAIT_SLEEP_INTERVAL=3
 
 volumes:
   mysql-data:
+  migrations-data:

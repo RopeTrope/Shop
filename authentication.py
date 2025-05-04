@@ -8,6 +8,7 @@ from datetime import timedelta
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 from flask_jwt_extended import set_access_cookies
 import json
+from flask_migrate import Migrate
 app = Flask(__name__)
 
 #creating app.db file in instance folder
@@ -26,8 +27,12 @@ app.config["JWT_TOKEN_LOCATION"]=["cookies"]
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 jwt = JWTManager(app)
 
+#Added migration for database
+migrate = Migrate(app,database)
+
 #initialize database
 database.init_app(app)
+migrate.init_app(app,database)
 
 @app.route("/",methods=['GET'])
 def hello():
@@ -147,10 +152,9 @@ def handle_expired_token(jwt_header,jwt_payload):
     response.delete_cookie("access_token_cookie")
     return response
 
-#TODO: Need to add Flask migrate
 #TODO: Password for mysql should be moved, maybe using environment variables
-#TODO: Commit tommorow changes
-#TODO: Structure of a project should be changed 
+#TODO: Structure of a project should be changed
+#TODO: Maybe it can be added to auto migrate
 if __name__ == "__main__":
     with app.app_context():
         #creating orm database

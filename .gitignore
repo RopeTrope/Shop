@@ -5,3 +5,7 @@ init
 instance
 
 __pycache__
+
+.venv
+
+*.pyc
