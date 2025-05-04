@@ -1,27 +1,31 @@
 import time
 from flask import Flask, render_template, request, jsonify, redirect, make_response
 from sqlalchemy.exc import OperationalError
-from models import database
-from utilities import validation,login_validation,check_hash_password
-from databaseUtils import find_user_by_email,add_user_to_db,delete_user
+from models.models import database
+from utilities.utilities import validation,login_validation,check_hash_password
+from utilities.databaseUtils import find_user_by_email,add_user_to_db,delete_user
 from datetime import timedelta
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 from flask_jwt_extended import set_access_cookies
 import json
+
 from flask_migrate import Migrate
+
+
+
 app = Flask(__name__)
 
 #creating app.db file in instance folder
 # When it is created it can be opened via db browser
-with open('keys.json','r') as file:
-    data = json.load(file)
-    secret_key = data["SECRET_JWT"]
+# with open('keys.json','r') as file:
+#     data = json.load(file)
+#     secret_key = data["SECRET_JWT"]
 
-JWT_SECRET_KEY = secret_key
+# JWT_SECRET_KEY = secret_key
 #TODO: This config probably should be moved to another place
 app.config["SQLALCHEMY_DATABASE_URI"] = f'mysql+pymysql://user:user@db:3306/Shop'
 #TODO: Key should be added in keys.json or something like that
-app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
+app.config["JWT_SECRET_KEY"] = "IXc6jIUiPqfrP4DF5jQ0ENhoXqhxWHi3MNEaS2/Bx2oC1mzVFe4nnmCMcXpzaOvs"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config["JWT_TOKEN_LOCATION"]=["cookies"]
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False

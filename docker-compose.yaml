@@ -1,2 +1,39 @@
+version: '3.1'
+
 services:
   
+  adminer:
+    image: adminer
+    ports:
+        - 8080:8080
+
+
+  db:
+    image: mysql
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: Shop
+        MYSQL_USER: user
+        MYSQL_PASSWORD: user
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+        - 3306:3306
+
+  authentication:
+    build:
+      context: .
+      dockerfile: authentication/Dockerfile
+    ports:
+        - 5000:5000
+    volumes:
+      - ./authentication:/usr/local/app/authentication
+      - migrations-data:/usr/local/app/authentication/migrations
+    depends_on:
+        - db
+    environment:
+      - FLASK_ENV=development
+
+volumes:
+  mysql-data:
+  migrations-data:
