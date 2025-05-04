@@ -21,18 +21,18 @@ services:
         - 3306:3306
 
   authentication:
-    image: authen
+    build:
+      context: .
+      dockerfile: authentication/Dockerfile
     ports:
         - 5000:5000
     volumes:
-      - migrations-data:/usr/local/app/migrations
+      - ./authentication:/usr/local/app/authentication
+      - migrations-data:/usr/local/app/authentication/migrations
     depends_on:
         - db
-    command: sh -c "/wait && /sayhello"
     environment:
-      - WAIT_HOSTS=3306
-      - WAIT_HOSTS_TIMEOUT=60
-      - WAIT_SLEEP_INTERVAL=3
+      - FLASK_ENV=development
 
 volumes:
   mysql-data:
