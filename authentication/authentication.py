@@ -15,17 +15,17 @@ from flask_migrate import Migrate
 
 app = Flask(__name__)
 
-#creating app.db file in instance folder
+# creating app.db file in instance folder
 # When it is created it can be opened via db browser
-# with open('keys.json','r') as file:
-#     data = json.load(file)
-#     secret_key = data["SECRET_JWT"]
+with open('keys.json','r') as file:
+    data = json.load(file)
+    secret_key = data["SECRET_TOKEN"]
 
 # JWT_SECRET_KEY = secret_key
 #TODO: This config probably should be moved to another place
 app.config["SQLALCHEMY_DATABASE_URI"] = f'mysql+pymysql://user:user@db:3306/Shop'
 #TODO: Key should be added in keys.json or something like that
-app.config["JWT_SECRET_KEY"] = "IXc6jIUiPqfrP4DF5jQ0ENhoXqhxWHi3MNEaS2/Bx2oC1mzVFe4nnmCMcXpzaOvs"
+app.config["JWT_SECRET_KEY"] = secret_key
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config["JWT_TOKEN_LOCATION"]=["cookies"]
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
@@ -157,7 +157,6 @@ def handle_expired_token(jwt_header,jwt_payload):
     return response
 
 #TODO: Password for mysql should be moved, maybe using environment variables
-#TODO: Structure of a project should be changed
 #TODO: Maybe it can be added to auto migrate
 if __name__ == "__main__":
     with app.app_context():
