@@ -27,12 +27,13 @@ services:
     ports:
         - 5000:5000
     volumes:
-      - ./authentication:/usr/local/app/authentication
-      - migrations-data:/usr/local/app/authentication/migrations
+      - ./authentication:/usr/local/app
+      - migrations-data:/usr/local/app/migrations
     depends_on:
         - db
     environment:
       - FLASK_ENV=development
+      - FLASK_APP=authentication.py
 
 volumes:
   mysql-data:
