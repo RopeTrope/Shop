@@ -1,42 +1,29 @@
+import os
 import time
 from flask import Flask, render_template, request, jsonify, redirect, make_response
 from sqlalchemy.exc import OperationalError
 from models.models import database
 from utilities.utilities import validation,login_validation,check_hash_password
 from utilities.databaseUtils import find_user_by_email,add_user_to_db,delete_user
-from datetime import timedelta
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 from flask_jwt_extended import set_access_cookies
-import json
 
-from flask_migrate import Migrate
+from flask_migrate import Migrate, init, upgrade, migrate, stamp
 
 
 
 app = Flask(__name__)
 
-# creating app.db file in instance folder
-# When it is created it can be opened via db browser
-with open('keys.json','r') as file:
-    data = json.load(file)
-    secret_key = data["SECRET_TOKEN"]
+app.config.from_object("config")
 
-# JWT_SECRET_KEY = secret_key
-#TODO: This config probably should be moved to another place
-app.config["SQLALCHEMY_DATABASE_URI"] = f'mysql+pymysql://user:user@db:3306/Shop'
-#TODO: Key should be added in keys.json or something like that
-app.config["JWT_SECRET_KEY"] = secret_key
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
-app.config["JWT_TOKEN_LOCATION"]=["cookies"]
-app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 jwt = JWTManager(app)
 
 #Added migration for database
-migrate = Migrate(app,database)
+migration = Migrate(app,database)
 
 #initialize database
 database.init_app(app)
-migrate.init_app(app,database)
+migration.init_app(app,database)
 
 @app.route("/",methods=['GET'])
 def hello():
@@ -156,7 +143,10 @@ def handle_expired_token(jwt_header,jwt_payload):
     response.delete_cookie("access_token_cookie")
     return response
 
-#TODO: Password for mysql should be moved, maybe using environment variables
+
+migration_path = os.path.join(os.getcwd(),'migrations')
+versions_path = os.path.join(migration_path,'versions')
+
 #TODO: Maybe it can be added to auto migrate
 if __name__ == "__main__":
     with app.app_context():
@@ -168,4 +158,10 @@ if __name__ == "__main__":
                 created = True
             except OperationalError:
                 time.sleep(3) 
+
+        if not os.path.exists(versions_path):
+            init(directory=migration_path,multidb=False)
+            stamp(directory=migration_path, revision='head')
+        migrate(directory=migration_path, message="Initial migration")
+        upgrade(directory=migration_path)
     app.run(debug=True, host="0.0.0.0")
