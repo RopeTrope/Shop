@@ -11,17 +11,11 @@ from flask_jwt_extended import set_access_cookies
 from flask_migrate import Migrate, init, upgrade, migrate, stamp
 
 
-
+#Later this should be move somewhere else
 app = Flask(__name__)
-
 app.config.from_object("config")
-
 jwt = JWTManager(app)
-
-#Added migration for database
 migration = Migrate(app,database)
-
-#initialize database
 database.init_app(app)
 migration.init_app(app,database)
 
@@ -116,21 +110,19 @@ def login():
     return render_template("login.html")
 
 
-@app.route("/delete",methods=["POST"])
+@app.route("/delete",methods=["GET","POST"])
 @jwt_required()
 def delete():
-    identity = get_jwt_identity()
-
-    user_exists = find_user_by_email(identity)
-
-    if user_exists is None:
-        return jsonify({"message": "Unknown user."}),400
-    
-    response = make_response(redirect("/login"))
-    response.delete_cookie("access_token_cookie")
-    delete_user(user=user_exists)
-
-    return response
+    if request.method == "POST":
+        identity = get_jwt_identity()
+        user_exists = find_user_by_email(identity)
+        if user_exists is None:
+            return jsonify({"message": "Unknown user."}),400
+        response = make_response(redirect("/login"))
+        response.delete_cookie("access_token_cookie")
+        delete_user(user=user_exists)
+        return response
+    return render_template("delete.html")
 
 
 @jwt.expired_token_loader
@@ -147,8 +139,8 @@ def handle_expired_token(jwt_header,jwt_payload):
 migration_path = os.path.join(os.getcwd(),'migrations')
 versions_path = os.path.join(migration_path,'versions')
 
-#TODO: Maybe it can be added to auto migrate
-if __name__ == "__main__":
+#TODO: Add owner accounts if not created
+def create_db_and_run_migrations():
     with app.app_context():
         #creating orm database
         created = False
@@ -164,4 +156,7 @@ if __name__ == "__main__":
             stamp(directory=migration_path, revision='head')
         migrate(directory=migration_path, message="Initial migration")
         upgrade(directory=migration_path)
+
+if __name__ == "__main__":
+    create_db_and_run_migrations()
     app.run(debug=True, host="0.0.0.0")
