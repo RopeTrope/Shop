@@ -9,3 +9,5 @@ __pycache__
 .venv
 
 *.pyc
+
+owner.json

@@ -1,17 +1,22 @@
-import os
-import time
 from flask import Flask, render_template, request, jsonify, redirect, make_response
-from sqlalchemy.exc import OperationalError
-from models.models import database
-from utilities.utilities import validation,login_validation,check_hash_password
-from utilities.databaseUtils import find_user_by_email,add_user_to_db,delete_user
+
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 from flask_jwt_extended import set_access_cookies
 
 from flask_migrate import Migrate, init, upgrade, migrate, stamp
 
+from sqlalchemy.exc import OperationalError
+from models.models import database
 
-#Later this should be move somewhere else
+from utilities.utilities import validation, login_validation, check_hash_password
+from utilities.databaseUtils import find_user_by_email, add_user_to_db, delete_user, create_owners
+import os
+import time
+
+
+
+
+#Later this should be moved somewhere else
 app = Flask(__name__)
 app.config.from_object("config")
 jwt = JWTManager(app)
@@ -29,7 +34,6 @@ def forbidden():
     ident = get_jwt_identity()
     return f"Hello {ident} to forbidden page"
 
-#TODO: Change login.html href so it can go to either customer register or register courier
 @app.route("/register_customer",methods=["GET","POST"])
 def register_customer():
     if request.method == "POST":
@@ -139,7 +143,6 @@ def handle_expired_token(jwt_header,jwt_payload):
 migration_path = os.path.join(os.getcwd(),'migrations')
 versions_path = os.path.join(migration_path,'versions')
 
-#TODO: Add owner accounts if not created
 def create_db_and_run_migrations():
     with app.app_context():
         #creating orm database
@@ -156,6 +159,8 @@ def create_db_and_run_migrations():
             stamp(directory=migration_path, revision='head')
         migrate(directory=migration_path, message="Initial migration")
         upgrade(directory=migration_path)
+        create_owners()
+
 
 if __name__ == "__main__":
     create_db_and_run_migrations()
