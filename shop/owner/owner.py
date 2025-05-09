@@ -5,8 +5,6 @@ from utilities.utilities import check_line,check_extension, file_exist
 from utilities.databaseUtils import check_product_exist,add_product, add_category_to_product
 
 
-import re
-
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
@@ -28,11 +26,7 @@ def update():
         #File is provided
         try:
             file_exist(file)
-        except ErrorHandler as e:
-            return jsonify({"message":e.message}),e.error_code
-        
-        #Valid extension of file
-        try:
+            #Valid extension of file
             check_extension(file)
         except ErrorHandler as e:
             return jsonify({"message":e.message}),e.error_code
@@ -42,11 +36,7 @@ def update():
         for index,line in enumerate(lines): 
             line_split = line.split(',')
             try:
-                categories, name, price = check_line(line_split,index).values()
-            except ErrorHandler as e:
-                return jsonify({"message":e.message}),e.error_code
-            
-            try:
+                categories, name, price = check_line(line_split,index).values()    
                 product = check_product_exist(name)
             except ErrorHandler as e:
                 return jsonify({"message":e.message}),e.error_code
@@ -56,7 +46,6 @@ def update():
             categories_splited = categories.split("|")
             for category in categories_splited:
                 add_category_to_product(category,product)
-        
         #Commit changes to database
         database.session.commit()            
     return render_template("update.html")
