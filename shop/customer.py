@@ -1,21 +1,40 @@
+from datetime import timedelta
 from flask import Flask, render_template, request, jsonify
+
+from flask_jwt_extended import JWTManager
+
+import json
 
 from models.models import database
 
-from utilities.utilities import ErrorHandler
+from utilities.utilities import ErrorHandler, get_email
 
 from utilities.databaseUtils import check_product_on_id, get_all_products, add_order,add_order_product,search_categories_on_name, search_products_on_name
-
+from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get_categories_by_product_id, get_quantity
+from utilities.decorators import customer_required
+from utilities.enums import Status
 
 app = Flask(__name__)
 
+with open('shop/keys.json','r') as file:
+    data = json.load(file)
+    secret_key=data['SECRET_TOKEN']
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
+
+app.config['JWT_SECRET_KEY']=secret_key
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+app.config['JWT_TOKEN_LOCATION']=['cookies']
+app.config['JWT_COOKIE_CSRF_PROTECT']=False
+
+jwt = JWTManager(app)
 
 database.init_app(app)
 
 
 #TODO: Should do the transition to base.html so it looks better and easier
 @app.route("/search",methods=["GET","POST"])
+@customer_required()
 def search():
     if request.method == "POST":
         product_name = request.form.get("pname")
@@ -33,8 +52,9 @@ def search():
 
     return render_template("search.html")
 
-
+#TODO: Do the revision of this route
 @app.route("/order",methods=["GET","POST"])
+@customer_required()
 def order():
     products = get_all_products()
     if request.method == "POST":
@@ -60,7 +80,7 @@ def order():
         except ErrorHandler as e:
             return jsonify({"message":e.message}),e.error_code
         
-        order = add_order()
+        order = add_order(get_email(),Status.CREATED.name)
         database.session.commit()
 
         for x in sending_req:
@@ -72,6 +92,33 @@ def order():
 
     return render_template("order.html", products=products)
 
+#TODO: Add html file
+#TODO: Test when with 2-3 user with different deliveries
+#TODO: Adde enums for types of users
+@app.route("/status",methods=["GET"])
+@customer_required()
+def status():
+    orders = get_my_orders(get_email())
+            
+    order_json = []
+    products_json = []
 
+    for order in orders:
+        products = get_products_by_order_id(order.id)
+        price = 0
+        for product in products:
+            categories = get_categories_by_product_id(product.id)
+            quantity = get_quantity(order.id, product.id).quantity
+            products_json.append({"categories":[category.name for category in categories], "name":product.name, "price":product.price, "quantity":quantity})
+            price += product.price * quantity
+        order_json.append({"products":[product_json for product_json in products_json], "price":round(price,2),"status":order.status, "timestamp":order.timestamp})
+        products_json = []
+
+    return jsonify({"orders":order_json}),200
+            
+    
+
+
+#TODO: Continue now to delivery
 if __name__=="__main__":
     app.run(debug=True,port=5200)

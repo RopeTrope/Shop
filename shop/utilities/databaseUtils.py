@@ -10,8 +10,8 @@ def add_product(name,price):
     database.session.add(product)
     return product
 
-def add_order():
-    order = Order()
+def add_order(email,status):
+    order = Order(email,status)
 
     database.session.add(order)
     return order
@@ -48,6 +48,21 @@ def check_product_exist(name):
 
 def get_all_products():
     return Product.query.all()
+
+def get_my_orders(email):
+    return Order.query.join(OrderProduct).join(Product).filter(Order.email ==email).all()
+
+def get_products_by_order_id(order_id):
+    return Product.query.join(OrderProduct).filter(OrderProduct.order_id == order_id).all()
+
+def get_categories_by_product_id(product_id):
+    return Category.query.join(product_category).filter(product_category.c.product_id == product_id).all()
+
+def get_quantity(order_id,product_id):
+    return OrderProduct.query.filter(OrderProduct.order_id == order_id, OrderProduct.product_id == product_id).one()
+
+def get_all_products_from_order(email):
+    return Product.query.join(OrderProduct).join(Product).filter(Order.email == email).all()
 
 def search_categories_on_name(search_category, search_product):
     return Category.query.join(product_category).join(Product).filter(Category.name.like(search_category),Product.name.like(search_product)).all()

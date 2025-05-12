@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 
 database = SQLAlchemy()
@@ -37,8 +38,15 @@ class Category(database.Model):
 class Order(database.Model):
     __tablename__ = "orders"
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    email = database.Column(database.String(256),nullable=False)
+    status = database.Column(database.String(32),nullable=False)
+    timestamp = database.Column(database.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     #Probably will add email of a user
     products = database.relationship("OrderProduct", back_populates='order')
+
+    def __init__(self,email,status):
+        self.email = email
+        self.status = status
 
 class OrderProduct(database.Model):
     __tablename__='order_product'

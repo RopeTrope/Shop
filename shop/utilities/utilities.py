@@ -3,6 +3,8 @@ from models.models import database
 from .exceptions import ErrorHandler
 import re
 
+from flask_jwt_extended import get_jwt_identity
+
 
 def file_exist(file):
     if file.filename == "":
@@ -53,3 +55,6 @@ def check_line(line_split,index):
     name_is_empty(name,index)
     price = check_price(line_split,index)
     return {"categories":categories,"name":name,"price":price}
+
+def get_email():
+    return get_jwt_identity()
