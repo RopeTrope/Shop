@@ -1,5 +1,6 @@
 from models.models import Product, Category, Order, OrderProduct, product_category
 from models.models import database
+from .enums import Status
 from .exceptions import ErrorHandler
 
 
@@ -58,6 +59,12 @@ def get_my_orders(email):
 
 def get_my_order_by_id(id,email):
     return Order.query.filter(Order.id == id, Order.email == email).one()
+
+def get_order_only_by_id(id):
+    return Order.query.filter(Order.id == id).one()
+
+def get_all_not_taken_orders():
+    return Order.query.filter(Order.status == Status.CREATED.name).all()
 
 def get_products_by_order_id(order_id):
     return Product.query.join(OrderProduct).filter(OrderProduct.order_id == order_id).all()

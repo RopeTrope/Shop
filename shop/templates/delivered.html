@@ -33,7 +33,7 @@
                     <form action="{{ url_for("delivered")}}" method="post">
                     <th scope="row">
 
-                            {{loop.index}}
+                            {{order.id}}
                             <input type="hidden" name="orderId" value="{{order.id}}" />
 
                     </th>   
