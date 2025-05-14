@@ -33,6 +33,7 @@ database.init_app(app)
 
 
 #TODO: Should do the transition to base.html so it looks better and easier
+#TODO: Add html
 @app.route("/search",methods=["GET","POST"])
 @customer_required()
 def search():
@@ -92,7 +93,6 @@ def order():
 
     return render_template("order.html", products=products)
 
-#TODO: Add html file
 #TODO: Test when with 2-3 user with different deliveries
 #TODO: Adde enums for types of users
 @app.route("/status",methods=["GET"])
@@ -114,9 +114,14 @@ def status():
         order_json.append({"products":[product_json for product_json in products_json], "price":round(price,2),"status":order.status, "timestamp":order.timestamp})
         products_json = []
 
-    return jsonify({"orders":order_json}),200
+    return render_template("status.html",orders=order_json)
             
-    
+
+@app.route("/delivered", methods=["GET","POST"])
+@customer_required()
+def delivered():
+
+    return "<h1>Hello delivered</h1>"
 
 
 #TODO: Continue now to delivery
