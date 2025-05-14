@@ -30,3 +30,16 @@ def owner_required():
                 return jsonify({"message":"No permission to access this route.."}), 400
         return decorator
     return wrapper
+
+def courier_required():
+    def wrapper(fn):
+        @wraps(fn)
+        @jwt_required()
+        def decorator(*args, **kwargs):
+            claims = get_jwt()
+            if claims["role"] == "Courier":
+                return fn(*args, **kwargs)
+            else:
+                return jsonify({"message":"No permission to access this route.."}), 400
+        return decorator
+    return wrapper
