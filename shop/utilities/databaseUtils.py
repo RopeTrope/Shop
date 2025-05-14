@@ -31,6 +31,10 @@ def add_category_to_product(category,product):
         product.categories.append(category_exists)
 
 
+def change_status_of_order(order,status):
+    order.status = status
+    database.session.commit()
+
 def check_category_exist(name):
     return Category.query.filter_by(name=name).first()
 
@@ -51,6 +55,9 @@ def get_all_products():
 
 def get_my_orders(email):
     return Order.query.join(OrderProduct).join(Product).filter(Order.email ==email).all()
+
+def get_my_order_by_id(id,email):
+    return Order.query.filter(Order.id == id, Order.email == email).one()
 
 def get_products_by_order_id(order_id):
     return Product.query.join(OrderProduct).filter(OrderProduct.order_id == order_id).all()

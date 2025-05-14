@@ -10,7 +10,7 @@ from models.models import database
 from utilities.utilities import ErrorHandler, get_email
 
 from utilities.databaseUtils import check_product_on_id, get_all_products, add_order,add_order_product,search_categories_on_name, search_products_on_name
-from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get_categories_by_product_id, get_quantity
+from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get_categories_by_product_id, get_quantity, get_my_order_by_id,change_status_of_order
 from utilities.decorators import customer_required
 from utilities.enums import Status
 
@@ -120,8 +120,24 @@ def status():
 @app.route("/delivered", methods=["GET","POST"])
 @customer_required()
 def delivered():
+    orders = get_my_orders(get_email())
+    if request.method == "POST":
+        order_id = request.form.get("orderId")
+        try:
+            if order_id is None:
+                raise ErrorHandler("Order id is missing",400)
+            
+            order_exists = get_my_order_by_id(order_id,get_email())
 
-    return "<h1>Hello delivered</h1>"
+            if not order_exists:
+                raise ErrorHandler("Order with this id does not exists.",400)        
+            
+        except ErrorHandler as e:
+            return jsonify({"message":e.message}),e.error_code
+    
+        change_status_of_order(order_exists,Status.COMPLETED.name)
+
+    return render_template("delivered.html",orders=orders)
 
 
 #TODO: Continue now to delivery
