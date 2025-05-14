@@ -16,43 +16,41 @@
 </head>
 <body class="d-flex justify-content-center align-items-center" style="height: 100vh; margin: 0;">
 
-    <form action="{{ url_for("order")}}" method="post">
+    <div class="container">
         <table class="table table-hover">
             <thead>
                 <tr>
                 <th scope="col">#</th>
-                <th scope="col">Product Name</th>
-                <th scope="col">Categories</th>
                 <th scope="col">Price</th>
-                <th scope="col">Quantity</th>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
-                {% for product in products %}
+                {% for order in orders %}
                 <tr>
+                    <form action="{{ url_for("delivered")}}" method="post">
                     <th scope="row">
-                        {{product.id}}
-                        <input type="hidden" name="productsId" value="{{product.id}}" />
-                    </th>
-                    <td>
-                        <p>{{product.name}}</p>
-                    </td>
-                    <td>
-                        {% for category in product.categories %}
-                            {{category.name}}
-                        {% endfor %}
-                    </td>
-                    <td>{{product.price}}</td>
-                    <td>
-                        <input class="form-control form-control-sm" name="productsQuant" type="number" value="0" min="0"/>
-                    </td>
+
+                            {{order.id}}
+                            <input type="hidden" name="orderId" value="{{order.id}}" />
+
+                    </th>   
+                    <td>{{order.price}}</td>
+                    <td>{{order.timestamp.strftime("%Y:%m:%d %H:%M:%S")}}</td>
+                    <td>{{order.status}}</td>
+                    {%if order.status != "DELIVERED": %}
+                        <td><button type="submit" class="btn btn-success btn-sm">Change to delivered</button></td>
+                    {%else%}
+                        <td></td>
+                    {%endif%}
+                        </form>
                 </tr>
-                {% endfor %}
+                {%endfor%}
             </tbody>
         </table>
-        <button type="submit" class="btn btn-success">Order</button>
-      </form>
-
+        </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Order</title>
+    <title>Status of Orders</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     <link rel="shortcut icon" href="#">
     <style>
         body {
             background-color:antiquewhite;
-        }
-
-        #header{
-            background-color: aquamarine;
         }
 
 
@@ -23,19 +19,18 @@
     <div class="container mt-4">
         <table class="table table-bordered">
             <h1>Status of Orders</h1>
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Timestamp</th>
-                </tr>
-            </thead>
             <tbody>
                 {% for order in orders %}
                 <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Timestamp</th>
+                </tr>
+
+                <tr>
                     <th scope="row">
-                        Order {{loop.index}}
+                        {{loop.index}}
                     </th>
                     <td>
                         {{order.price}}
@@ -46,6 +41,11 @@
                     <td>
                         {{order.timestamp.strftime("%Y:%m:%d %H:%M:%S")}}
                     </td>  
+                </tr>
+                <tr>
+                    <th class="text-center" style="background-color: beige;" colspan="4">
+                        <h1>Products</h1>
+                    </th>
                 </tr>
 
                 <tr>
@@ -75,6 +75,11 @@
                                     </tbody>
                                 </table>
                             </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="background-color: beige;">
+
+                    </td>
                 </tr>
                 {% endfor %}
                 
