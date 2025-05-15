@@ -1,9 +1,6 @@
-from datetime import timedelta
 from flask import Flask, render_template, request, jsonify
 
 from flask_jwt_extended import JWTManager
-
-import json
 
 from models.models import database
 
@@ -14,18 +11,11 @@ from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get
 from utilities.decorators import customer_required
 from utilities.enums import Status
 
+
+
 app = Flask(__name__)
 
-with open('shop/keys.json','r') as file:
-    data = json.load(file)
-    secret_key=data['SECRET_TOKEN']
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
-
-app.config['JWT_SECRET_KEY']=secret_key
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
-app.config['JWT_TOKEN_LOCATION']=['cookies']
-app.config['JWT_COOKIE_CSRF_PROTECT']=False
+app.config.from_object("config")
 
 jwt = JWTManager(app)
 
@@ -33,7 +23,6 @@ database.init_app(app)
 
 
 #TODO: Should do the transition to base.html so it looks better and easier
-#TODO: Add html
 @app.route("/search",methods=["GET","POST"])
 @customer_required()
 def search():
@@ -93,7 +82,6 @@ def order():
 
     return render_template("order.html", products=products)
 
-#TODO: Test when with 2-3 user with different deliveries
 #TODO: Adde enums for types of users
 @app.route("/status",methods=["GET"])
 @customer_required()
@@ -132,6 +120,10 @@ def delivered():
             if not order_exists:
                 raise ErrorHandler("Order with this id does not exists.",400)        
             
+            if order_exists.status == Status.COMPLETED.name:
+                raise ErrorHandler("Order is already completed.",400)
+
+
         except ErrorHandler as e:
             return jsonify({"message":e.message}),e.error_code
     
@@ -139,7 +131,5 @@ def delivered():
 
     return render_template("delivered.html",orders=orders)
 
-
-#TODO: Continue now to delivery
 if __name__=="__main__":
-    app.run(debug=True,port=5200)
+    app.run(debug=True,host="0.0.0.0")

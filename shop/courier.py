@@ -1,4 +1,3 @@
-from datetime import timedelta
 from flask import Flask, render_template, request, jsonify
 from flask_jwt_extended import JWTManager
 from models.models import database
@@ -9,31 +8,16 @@ from utilities.databaseUtils import get_all_not_taken_orders, get_order_only_by_
 from utilities.enums import Status
 from utilities.exceptions import ErrorHandler
 
-import json
-
 
 
 app = Flask(__name__)
 
-with open('shop/keys.json','r') as file:
-    data = json.load(file)
-    secret_key=data['SECRET_TOKEN']
-
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
-
-app.config['JWT_SECRET_KEY']=secret_key
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
-app.config['JWT_TOKEN_LOCATION']=['cookies']
-app.config['JWT_COOKIE_CSRF_PROTECT']=False
+app.config.from_object("config")
 
 jwt = JWTManager(app)
 
 database.init_app(app)
 
-
-#TODO: Add access control
-#TODO: Should change in other routes to show id of order and not indexing
 @app.route("/orders_to_deliver",methods=["GET"])
 @courier_required()
 def orders_to_deliver():
@@ -53,6 +37,10 @@ def pick_up_order():
             order_exists = get_order_only_by_id(order_id)
             if order_exists is None:
                 raise ErrorHandler("Invalid order id.",400)
+            
+            if order_exists.status != Status.CREATED.name:
+                raise ErrorHandler("Order is already picked up.",400)
+            
         except ErrorHandler as e:
             return jsonify({"message":e.message}),e.error_code
         
@@ -63,6 +51,6 @@ def pick_up_order():
     return render_template("pick_up_order.html",orders=orders)
     
 
-
+#TODO: Add healthcheck maybe for customer and courier to wait for owner
 if __name__=="__main__":
-    app.run(debug=True,port=5300)
+    app.run(debug=True,host="0.0.0.0")

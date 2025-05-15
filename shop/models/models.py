@@ -31,7 +31,7 @@ class Category(database.Model):
     __tablename__='categories'
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     name = database.Column(database.String(64), nullable=False)
-    
+
     def __init__(self,name):
         self.name = name
 
@@ -54,7 +54,6 @@ class OrderProduct(database.Model):
     product_id = database.Column(database.Integer,database.ForeignKey('products.id'),primary_key=True)
 
     quantity = database.Column(database.Integer, nullable=False)
-
 
     order = database.relationship('Order', back_populates='products')
     product = database.relationship('Product', back_populates='orders')
