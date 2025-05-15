@@ -41,7 +41,7 @@
                     <td>{{order.timestamp.strftime("%Y:%m:%d %H:%M:%S")}}</td>
                     <td>{{order.status}}</td>
                     {%if order.status != "DELIVERED": %}
-                        <td><button type="submit" class="btn btn-success btn-sm">Change to delivered</button></td>
+                        <td><button type="submit" class="btn btn-success btn-sm">Complete Delivery</button></td>
                     {%else%}
                         <td></td>
                     {%endif%}

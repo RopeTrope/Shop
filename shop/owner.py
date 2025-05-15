@@ -1,43 +1,35 @@
-from datetime import timedelta
+import os
+import time
+
 from flask import Flask, render_template, request, jsonify
+from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate, init, upgrade, migrate, stamp
+
 from models.models import database
+
 from utilities.exceptions import ErrorHandler
 from utilities.utilities import check_line,check_extension, file_exist
 from utilities.databaseUtils import check_product_exist,add_product, add_category_to_product
-
 from utilities.decorators import owner_required
 
-from flask_jwt_extended import JWTManager
-
-import json
-
+from sqlalchemy.exc import OperationalError
 
 app = Flask(__name__)
 
-with open('shop/keys.json','r') as file:
-    data = json.load(file)
-    secret_key=data['SECRET_TOKEN']
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
-
-app.config['JWT_SECRET_KEY']=secret_key
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
-app.config['JWT_TOKEN_LOCATION']=['cookies']
-app.config['JWT_COOKIE_CSRF_PROTECT']=False
+app.config.from_object("config")
 
 jwt = JWTManager(app)
 
+migration = Migrate(app,database)
+
 database.init_app(app)
 
-#TODO: Need to add JWT access control 
 @app.route("/",methods=["GET"])
 @owner_required()
 def hello_owner():
     return "<h1>Hello owner</h1>"
 
 #TODO: Maybe add message when csv file is added successfully
-#TODO: Make it one try except
-#TODO: Refactor it a lil bit more later
 @app.route("/update", methods=["GET","POST"])
 @owner_required()
 def update():
@@ -71,10 +63,23 @@ def update():
     return render_template("update.html")
 
 
+migration_path = os.path.join(os.getcwd(),'migrations')
+versions_path = os.path.join(migration_path,'versions')
 
-#TODO: inserting to test the database
-#Database was created good i guess
 if __name__ == "__main__":
     with app.app_context():
-        database.create_all()
-    app.run(debug=True,port=5100)
+        created = False
+        while created is False:
+                try:
+                    database.create_all()
+                    created = True
+                except OperationalError:
+                    time.sleep(3)
+
+        if not os.path.exists(versions_path):
+            init(directory=migration_path,multidb=False)
+            stamp(directory=migration_path, revision='head')
+        migrate(directory=migration_path, message="Initial migration")
+        upgrade(directory=migration_path)
+
+    app.run(debug=True,host="0.0.0.0")

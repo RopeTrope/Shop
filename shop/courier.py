@@ -31,9 +31,6 @@ jwt = JWTManager(app)
 
 database.init_app(app)
 
-
-#TODO: Add access control
-#TODO: Should change in other routes to show id of order and not indexing
 @app.route("/orders_to_deliver",methods=["GET"])
 @courier_required()
 def orders_to_deliver():
@@ -53,6 +50,10 @@ def pick_up_order():
             order_exists = get_order_only_by_id(order_id)
             if order_exists is None:
                 raise ErrorHandler("Invalid order id.",400)
+            
+            if order_exists.status != Status.CREATED.name:
+                raise ErrorHandler("Order is already picked up.",400)
+            
         except ErrorHandler as e:
             return jsonify({"message":e.message}),e.error_code
         
@@ -63,6 +64,9 @@ def pick_up_order():
     return render_template("pick_up_order.html",orders=orders)
     
 
-
+#TODO: DEPLOYMENT PHASE OF COURIER
+#TODO: Add networks so you cant access from adminer to both databases
+#TODO: Dockerfile to create(courier)
+#TODO: Update dockercompose.yml
 if __name__=="__main__":
     app.run(debug=True,port=5300)
