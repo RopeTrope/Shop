@@ -6,11 +6,15 @@ services:
     image: adminer
     ports:
         - 8080:8080
+    networks:
+      - authen
         
   adminer_shop:
     image: adminer
     ports:
         - 8090:8080
+    networks:
+      - shop
 
   db:
     image: mysql
@@ -23,6 +27,8 @@ services:
       - mysql-data:/var/lib/mysql
     ports:
         - 3306:3306
+    networks:
+      - authen
   
   db_shop:
     image: mysql
@@ -35,30 +41,8 @@ services:
       - mysql-data-shop:/var/lib/mysql
     ports:
         - 3360:3306
-    
-  
-  owner:
-    build:
-      dockerfile: shop/owner.dockerfile
-    ports:
-        - 5100:5000
-    volumes:
-      - migrations-data-shop:/usr/local/app/migrations
-    depends_on:
-      - db_shop  
-    environment:
-      - FLASK_APP=owner.py
-  
-  customer:
-    build:
-      dockerfile: shop/customer.dockerfile
-    ports:
-        - 5200:5000
-    depends_on:
-      - db_shop
-      - owner
-    environment:
-      - FLASK_APP=customer.py
+    networks:
+      - shop
 
   authentication:
     build:
@@ -74,6 +58,53 @@ services:
     environment:
       - FLASK_ENV=development
       - FLASK_APP=authentication.py
+    networks:
+      - authen
+  
+  owner:
+    build:
+      dockerfile: shop/owner.dockerfile
+    ports:
+        - 5100:5000
+    volumes:
+      - migrations-data-shop:/usr/local/app/migrations
+    depends_on:
+      - db_shop  
+    environment:
+      - FLASK_APP=owner.py
+    networks:
+      - shop
+  
+  customer:
+    build:
+      dockerfile: shop/customer.dockerfile
+    ports:
+        - 5200:5000
+    depends_on:
+      - owner
+    environment:
+      - FLASK_APP=customer.py
+    networks:
+      - shop
+
+  courier:
+    build:
+      dockerfile: shop/courier.dockerfile
+    ports:
+        - 5300:5000
+    depends_on:
+      - owner
+    environment:
+      - FLASK_APP=courier.py
+    networks:
+      - shop
+
+
+networks:
+  shop:
+    driver: bridge
+  authen:
+    driver: bridge
 
 volumes:
   mysql-data:

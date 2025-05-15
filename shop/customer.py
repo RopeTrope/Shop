@@ -23,7 +23,6 @@ database.init_app(app)
 
 
 #TODO: Should do the transition to base.html so it looks better and easier
-#TODO: Add html
 @app.route("/search",methods=["GET","POST"])
 @customer_required()
 def search():
@@ -83,7 +82,6 @@ def order():
 
     return render_template("order.html", products=products)
 
-#TODO: Test when with 2-3 user with different deliveries
 #TODO: Adde enums for types of users
 @app.route("/status",methods=["GET"])
 @customer_required()
@@ -133,7 +131,5 @@ def delivered():
 
     return render_template("delivered.html",orders=orders)
 
-
-#TODO: Continue now to delivery
 if __name__=="__main__":
     app.run(debug=True,host="0.0.0.0")
