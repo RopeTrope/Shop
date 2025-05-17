@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, jsonify
-
 from flask_jwt_extended import JWTManager
 
 from models.models import database
 
 from utilities.utilities import ErrorHandler, get_email
 
-from utilities.databaseUtils import check_product_on_id, get_all_products, add_order,add_order_product,search_categories_on_name, search_products_on_name
-from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get_categories_by_product_id, get_quantity, get_my_order_by_id,change_status_of_order
+from utilities.databaseUtils import check_product_on_id, get_all_products, add_order,add_order_product,search_categories_on_name, search_products_on_name, update_product_waiting
+from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get_categories_by_product_id, get_quantity, get_my_order_by_id,change_status_of_order, update_product_sold
 from utilities.decorators import customer_required
 from utilities.enums import Status
 
@@ -63,6 +62,8 @@ def order():
                     raise ErrorHandler("Invalid product id.",400)
                 
                 sending_req.append({"id":product_id,"quantity":product_quant})
+                #Update waiting column
+                update_product_waiting(product_exist,product_quant)
             
             if sending_req == []:
                 raise ErrorHandler("Please pick a product to order.",400)
@@ -128,6 +129,10 @@ def delivered():
             return jsonify({"message":e.message}),e.error_code
     
         change_status_of_order(order_exists,Status.COMPLETED.name)
+
+        for order_product in order_exists.products:
+            update_product_sold(order_product.product,order_product.quantity)
+
 
     return render_template("delivered.html",orders=orders)
 

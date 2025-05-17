@@ -17,6 +17,8 @@ class Product(database.Model):
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     name = database.Column(database.String(64), nullable=False)
     price = database.Column(database.Double, nullable=False)
+    sold = database.Column(database.Integer, nullable=False )
+    waiting = database.Column(database.Integer, nullable=False)
     categories = database.relationship('Category', secondary=product_category, backref='products')
 
     orders = database.relationship('OrderProduct',back_populates='product')
@@ -25,6 +27,8 @@ class Product(database.Model):
     def __init__(self,name,price):
         self.name = name
         self.price = price
+        self.sold = 0
+        self.waiting = 0
         self.categories = []
 
 class Category(database.Model):

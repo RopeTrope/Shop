@@ -52,5 +52,9 @@ def pick_up_order():
     
 
 #TODO: Add healthcheck maybe for customer and courier to wait for owner
+#TODO: README update
+#TODO: Maybe add logging
+#TODO: Update database for product to add number of sold and number of waiting products so i can proceed to spark
+#TODO: Add spark for statistics
 if __name__=="__main__":
     app.run(debug=True,host="0.0.0.0")

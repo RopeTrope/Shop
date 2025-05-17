@@ -83,3 +83,11 @@ def search_categories_on_name(search_category, search_product):
 
 def search_products_on_name(search_category, search_product):
     return Product.query.join(product_category).join(Category).filter(Category.name.like(search_category),Product.name.like(search_product)).all()
+
+def update_product_waiting(product:Product,quantity):
+    product.waiting += int(quantity)
+
+def update_product_sold(product:Product,quantity):
+    product.sold += int(quantity)
+    product.waiting -= int(quantity)
+    database.session.commit()
