@@ -11,3 +11,11 @@ __pycache__
 *.pyc
 
 owner.json
+
+authentication.yaml
+
+just_database.yaml
+
+shop.yaml
+
+*.ps1
