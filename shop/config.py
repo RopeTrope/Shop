@@ -8,6 +8,11 @@ DATABASE_NAME="db_shop"
 DATABASE_PORT=3306
 DATABASE="Shop"
 
+SPARK_NAME="sparkapp"
+SPARK_PORT=5400
+SPARK_PRODUCT_STATISTICS_ROUTE="product_statistics"
+SPARK_CATEGORY_STATISTICS_ROUTE="category_statistics"
+
 cwd = os.path.dirname(os.path.abspath(__file__))
 file_path = os.path.join(cwd,'keys.json')
 
@@ -20,3 +25,4 @@ JWT_SECRET_KEY=secret_key
 JWT_ACCESS_TOKEN_EXPIRES=timedelta(hours=1)
 JWT_TOKEN_LOCATION=["cookies"]
 JWT_COOKIE_CSRF_PROTECT=False
+

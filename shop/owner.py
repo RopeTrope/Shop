@@ -1,7 +1,7 @@
 import os
 import time
-
-from flask import Flask, render_template, request, jsonify
+import requests
+from flask import Flask, Response, render_template, request, jsonify
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate, init, upgrade, migrate, stamp
 
@@ -11,6 +11,8 @@ from utilities.exceptions import ErrorHandler
 from utilities.utilities import check_line,check_extension, file_exist
 from utilities.databaseUtils import check_product_exist,add_product, add_category_to_product
 from utilities.decorators import owner_required
+
+from config import SPARK_NAME, SPARK_PORT, SPARK_PRODUCT_STATISTICS_ROUTE, SPARK_CATEGORY_STATISTICS_ROUTE
 
 from sqlalchemy.exc import OperationalError
 
@@ -61,6 +63,16 @@ def update():
         #Commit changes to database
         database.session.commit()            
     return render_template("update.html")
+
+@app.route("/product_statistics")
+def product_statistics():
+    response = requests.get(f"http://{SPARK_NAME}:{SPARK_PORT}/{SPARK_PRODUCT_STATISTICS_ROUTE}")
+    return Response(response.text, mimetype="text/html")
+
+@app.route("/category_statistics")
+def category_statistics():
+    response = requests.get(f"http://{SPARK_NAME}:{SPARK_PORT}/{SPARK_CATEGORY_STATISTICS_ROUTE}")
+    return Response(response.text, mimetype="text/html")
 
 
 migration_path = os.path.join(os.getcwd(),'migrations')

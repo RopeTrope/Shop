@@ -5,3 +5,4 @@ flask-jwt-extended
 cryptography
 flask-migrate
 Flask-Migrate
+requests

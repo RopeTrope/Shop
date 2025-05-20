@@ -43,6 +43,7 @@ services:
         - 3360:3306
     networks:
       - shop
+      - stats
 
   authentication:
     build:
@@ -74,6 +75,7 @@ services:
       - FLASK_APP=owner.py
     networks:
       - shop
+      - stats
   
   customer:
     build:
@@ -102,9 +104,13 @@ services:
 
 networks:
   shop:
-    driver: bridge
+    external: true
+    name: shop-network
   authen:
     driver: bridge
+  stats:
+    external: true
+    name: shop-stats
 
 volumes:
   mysql-data:
