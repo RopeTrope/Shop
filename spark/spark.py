@@ -31,4 +31,4 @@ def category_statistics():
     return render_template("category_statistics.html",categories=data["statistics"])
 
 if __name__ == "__main__":
-    app.run(host = "0.0.0.0")
+    app.run(host = "0.0.0.0", port=5400)
