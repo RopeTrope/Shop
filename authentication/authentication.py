@@ -8,7 +8,7 @@ from flask_migrate import Migrate, init, upgrade, migrate, stamp
 from sqlalchemy.exc import OperationalError
 from models.models import database
 
-from utilities.utilities import validation, login_validation, check_hash_password
+from utilities.utilities import validation, login_validation, check_hash_password, Role
 from utilities.databaseUtils import find_user_by_email, add_user_to_db, delete_user, create_owners
 import os
 import time
@@ -16,7 +16,6 @@ import time
 
 
 
-#Later this should be moved somewhere else
 app = Flask(__name__)
 app.config.from_object("config")
 jwt = JWTManager(app)
@@ -49,7 +48,7 @@ def register_customer():
         if user_exists is not None:
             return jsonify({"message": "Email already exists."}),400
         
-        add_user_to_db(fname,lname,email,password,"Customer")
+        add_user_to_db(fname,lname,email,password,Role.Customer.name)
 
         return redirect("/login")
 
@@ -74,7 +73,7 @@ def register_courier():
         if user_exists is not None:
             return jsonify({"message":"Email already exists."}),400
         
-        add_user_to_db(fname,lname,email,password,"Courier")
+        add_user_to_db(fname,lname,email,password,Role.Courier.name)
 
         return  redirect("/login")
 
@@ -99,11 +98,9 @@ def login():
             if check_hash_password(password,user_exists.password) is False:
                 return jsonify({"message":"Invalid credentials."}),400
 
-        #TODO: Bad practice to return hashed_password but for now it can stay
         claims = {
             "first_name":user_exists.first_name,
             "last_name":user_exists.last_name,
-            "password":user_exists.password,
             "role":user_exists.role
                    }
         token = create_access_token(identity=email, additional_claims=claims)
@@ -131,10 +128,6 @@ def delete():
 
 @jwt.expired_token_loader
 def handle_expired_token(jwt_header,jwt_payload):
-    #If any of tokens are expired force login this is the easiest way
-    #Maybe it can be done if refresh token expired force login
-    #But if it is access put a page where you have to click to refresh token
-    #Which send post to /refresh_token
     response = make_response(redirect("/login"))
     response.delete_cookie("access_token_cookie")
     return response
@@ -161,7 +154,9 @@ def create_db_and_run_migrations():
         upgrade(directory=migration_path)
         create_owners()
 
-
+#TODO: Add logout
+#TODO: Add home for all types of users html
+#TODO: Remove expired
 if __name__ == "__main__":
     create_db_and_run_migrations()
     app.run(debug=True, host="0.0.0.0")

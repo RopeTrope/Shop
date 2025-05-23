@@ -1,7 +1,6 @@
 from models.models import Product, Category, Order, OrderProduct, product_category
 from models.models import database
 from .enums import Status
-from .exceptions import ErrorHandler
 
 
 
@@ -43,12 +42,8 @@ def check_category_exist(name):
 def check_product_on_id(product_id):
     return Product.query.filter(Product.id == product_id).first()
 
-#TODO: error handlers should not be here
 def check_product_exist(name):
     product_exists = Product.query.filter_by(name=name).first()
-    if product_exists:
-        database.session.rollback()
-        raise ErrorHandler(f"Product {name} already exists.",400)
     return product_exists
 
 def get_all_products():

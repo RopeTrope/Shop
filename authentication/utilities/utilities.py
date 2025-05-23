@@ -1,7 +1,13 @@
+from enum import Enum
 import re
 
 import bcrypt
 
+
+class Role(Enum):
+    Owner = 1
+    Customer = 2
+    Courier = 3
 
 
 def validation(fname,lname,email,password):
