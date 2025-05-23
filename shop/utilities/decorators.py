@@ -2,6 +2,7 @@ from functools import wraps
 
 from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt
+from .enums import Role
 
 
 
@@ -11,7 +12,7 @@ def customer_required():
         @jwt_required()
         def decorator(*args, **kwargs):
             claims = get_jwt()
-            if claims["role"] == "Customer":
+            if claims["role"] == Role.Customer.name:
                 return fn(*args, **kwargs)
             else:
                 return jsonify({"message":"No permission to access this route.."}), 400
@@ -24,7 +25,7 @@ def owner_required():
         @jwt_required()
         def decorator(*args, **kwargs):
             claims = get_jwt()
-            if claims["role"] == "Owner":
+            if claims["role"] == Role.Owner.name:
                 return fn(*args, **kwargs)
             else:
                 return jsonify({"message":"No permission to access this route.."}), 400
@@ -37,7 +38,7 @@ def courier_required():
         @jwt_required()
         def decorator(*args, **kwargs):
             claims = get_jwt()
-            if claims["role"] == "Courier":
+            if claims["role"] == Role.Courier.name:
                 return fn(*args, **kwargs)
             else:
                 return jsonify({"message":"No permission to access this route.."}), 400

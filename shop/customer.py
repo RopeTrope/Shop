@@ -21,7 +21,6 @@ jwt = JWTManager(app)
 database.init_app(app)
 
 
-#TODO: Should do the transition to base.html so it looks better and easier
 @app.route("/search",methods=["GET","POST"])
 @customer_required()
 def search():
@@ -41,7 +40,6 @@ def search():
 
     return render_template("search.html")
 
-#TODO: Do the revision of this route
 @app.route("/order",methods=["GET","POST"])
 @customer_required()
 def order():
@@ -83,7 +81,6 @@ def order():
 
     return render_template("order.html", products=products)
 
-#TODO: Adde enums for types of users
 @app.route("/status",methods=["GET"])
 @customer_required()
 def status():
@@ -123,6 +120,9 @@ def delivered():
             
             if order_exists.status == Status.COMPLETED.name:
                 raise ErrorHandler("Order is already completed.",400)
+
+            if order_exists.status == Status.CREATED.name:
+                raise ErrorHandler("Order is not picked up by courier be patient.")
 
 
         except ErrorHandler as e:

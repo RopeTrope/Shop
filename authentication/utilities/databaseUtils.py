@@ -1,7 +1,8 @@
 from models.models import User
 from models.models import database
-from utilities.utilities import hashing_password
+from utilities.utilities import hashing_password, Role
 import json
+
 
 def find_user_by_email(email):
    return User.query.filter_by(email=email).first()
@@ -26,7 +27,7 @@ def create_owners():
          lname = owner["last_name"]
          mail = owner["email"]
          password = owner["password"]
-         role = "Owner"
+         role = Role.Owner.name
          user_exists = find_user_by_email(mail)
          if user_exists is None:
             add_user_to_db(fname,lname,mail,password,role)

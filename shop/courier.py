@@ -51,8 +51,7 @@ def pick_up_order():
     return render_template("pick_up_order.html",orders=orders)
     
 
-#TODO: Add healthcheck maybe for customer and courier to wait for owner
 #TODO: README update
-#TODO: Maybe add logging
+#TODO: Update html pages 
 if __name__=="__main__":
     app.run(debug=True,host="0.0.0.0")

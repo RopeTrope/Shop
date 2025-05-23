@@ -52,6 +52,9 @@ def update():
             try:
                 categories, name, price = check_line(line_split,index).values()    
                 product = check_product_exist(name)
+                if product:
+                    database.session.rollback()
+                    raise ErrorHandler(f"Product {name} already exists.",400)
             except ErrorHandler as e:
                 return jsonify({"message":e.message}),e.error_code
 
