@@ -1,7 +1,7 @@
 import os
 import time
 import requests
-from flask import Flask, Response, render_template, request, jsonify
+from flask import Flask, Response, render_template, request, jsonify, flash
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate, init, upgrade, migrate, stamp
 
@@ -18,6 +18,8 @@ from sqlalchemy.exc import OperationalError
 
 app = Flask(__name__)
 
+app.secret_key = "my-secret-key"
+
 app.config.from_object("config")
 
 jwt = JWTManager(app)
@@ -31,7 +33,6 @@ database.init_app(app)
 def hello_owner():
     return "<h1>Hello owner</h1>"
 
-#TODO: Maybe add message when csv file is added successfully
 @app.route("/update", methods=["GET","POST"])
 @owner_required()
 def update():
@@ -43,7 +44,8 @@ def update():
             #Valid extension of file
             check_extension(file)
         except ErrorHandler as e:
-            return jsonify({"message":e.message}),e.error_code
+            flash(e.message,"danger")
+            return render_template("update.html")
 
         decoded_file = file.read().decode()
         lines = decoded_file.split('\n')
@@ -56,7 +58,8 @@ def update():
                     database.session.rollback()
                     raise ErrorHandler(f"Product {name} already exists.",400)
             except ErrorHandler as e:
-                return jsonify({"message":e.message}),e.error_code
+                flash(e.message, "danger")
+                return render_template("update.html")
 
             product = add_product(name,price)
 
@@ -64,7 +67,8 @@ def update():
             for category in categories_splited:
                 add_category_to_product(category,product)
         #Commit changes to database
-        database.session.commit()            
+        database.session.commit()
+        flash("Products added sucessfully.","success")            
     return render_template("update.html")
 
 @app.route("/product_statistics")

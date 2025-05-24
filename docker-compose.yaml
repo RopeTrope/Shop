@@ -63,8 +63,8 @@ services:
       - authen
   
   owner:
-    build:
-      dockerfile: shop/owner.dockerfile
+    image: owner-app:latest
+    container_name: owner
     ports:
         - 5100:5000
     volumes:
@@ -78,8 +78,8 @@ services:
       - stats
   
   customer:
-    build:
-      dockerfile: shop/customer.dockerfile
+    image: customer-app:latest
+    container_name: customer
     ports:
         - 5200:5000
     depends_on:
@@ -90,8 +90,8 @@ services:
       - shop
 
   courier:
-    build:
-      dockerfile: shop/courier.dockerfile
+    image: courier-app:latest
+    container_name: courier
     ports:
         - 5300:5000
     depends_on:

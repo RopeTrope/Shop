@@ -1,5 +1,5 @@
 import json
-from flask import Flask,render_template
+from flask import Flask,render_template, redirect
 import os
 import subprocess
 app = Flask(__name__)
@@ -17,6 +17,11 @@ def product_statistics():
 
 
     return render_template("product_statistics.html", products=data["statistics"])
+
+@app.route("/update")
+def update():
+    return redirect("http://localhost:5100/update")
+
 
 @app.route("/category_statistics")
 def category_statistics():

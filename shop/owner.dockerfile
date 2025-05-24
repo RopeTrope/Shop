@@ -6,6 +6,7 @@ COPY ./shop/requirements.txt .
 COPY ./shop/owner.py .
 COPY ./shop/keys.json .
 COPY ./shop/models ./models
+COPY  ./shop/templates/base_owner.html ./templates/base_owner.html
 COPY ./shop/templates/update.html ./templates/update.html
 COPY ./shop/config.py .
 COPY ./shop/utilities ./utilities
