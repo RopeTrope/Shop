@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, redirect, flash
 from flask_jwt_extended import JWTManager
 from models.models import database
 
@@ -27,7 +27,7 @@ def orders_to_deliver():
 @app.route("/pick_up_order",methods=["GET","POST"])
 @courier_required()
 def pick_up_order():
-
+    orders = get_all_not_taken_orders()
     if request.method == "POST":
         order_id = request.form.get("orderId")
         try:
@@ -42,11 +42,11 @@ def pick_up_order():
                 raise ErrorHandler("Order is already picked up.",400)
             
         except ErrorHandler as e:
-            return jsonify({"message":e.message}),e.error_code
+            flash(e.message,"danger")
+            return redirect("pick_up_order.html",orders=orders)
         
         change_status_of_order(order_exists,Status.PENDING.name)
-
-    orders = get_all_not_taken_orders()
+        flash(f"Order with id:{order_id} is picked successfully!","success")
         
     return render_template("pick_up_order.html",orders=orders)
     
