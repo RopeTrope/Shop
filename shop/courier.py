@@ -12,6 +12,8 @@ from utilities.exceptions import ErrorHandler
 
 app = Flask(__name__)
 
+app.secret_key = "my-secret-key"
+
 app.config.from_object("config")
 
 jwt = JWTManager(app)
@@ -43,7 +45,7 @@ def pick_up_order():
             
         except ErrorHandler as e:
             flash(e.message,"danger")
-            return redirect("pick_up_order.html",orders=orders)
+            return redirect("/pick_up_order",orders=orders)
         
         change_status_of_order(order_exists,Status.PENDING.name)
         flash(f"Order with id:{order_id} is picked successfully!","success")

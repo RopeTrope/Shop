@@ -1,27 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Order</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <link rel="shortcut icon" href="#">
-    <style>
-        body {
-            background-color:antiquewhite;
-        }
+{%extends "base_customer.html" %}
 
-    </style>
 
-</head>
-<body class="d-flex justify-content-center align-items-center" style="height: 100vh; margin: 0;">
+{%block title%}Confirm Delivery{%endblock%}
 
-    <div class="container">
-        <table class="table table-hover">
+{%block style%}
+<style>
+    body {
+        background-color: antiquewhite;
+    }
+</style> 
+
+{%endblock%}
+
+{%block content%}
+
+<div class="container d-flex justify-content-center min-vh-100 align-items-center">
+    <div class="w-75 p-4 shadow rounded" style="background-color: #fdce8c;">
+        <table class="table table-striped">
             <thead>
                 <tr>
                 <th scope="col">#</th>
-                <th scope="col">Price</th>
                 <th scope="col">Timestamp</th>
                 <th scope="col">Status</th>
                 <th scope="col"></th>
@@ -37,11 +35,14 @@
                             <input type="hidden" name="orderId" value="{{order.id}}" />
 
                     </th>   
-                    <td>{{order.price}}</td>
                     <td>{{order.timestamp.strftime("%Y:%m:%d %H:%M:%S")}}</td>
                     <td>{{order.status}}</td>
                     {%if order.status != "DELIVERED": %}
-                        <td><button type="submit" class="btn btn-success btn-sm">Complete Delivery</button></td>
+                        <td>
+                             <div class="d-flex justify-content-center">
+                                    <button type="submit" class="btn btn-success">Complete Delivery</button>
+                             </div>
+                        </td>
                     {%else%}
                         <td></td>
                     {%endif%}
@@ -51,7 +52,7 @@
             </tbody>
         </table>
         </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
-</body>
-</html>
+</div>
+
+{%endblock%}
 

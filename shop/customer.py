@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,redirect,flash, url_for
 from flask_jwt_extended import JWTManager
 
 from models.models import database
@@ -13,6 +13,8 @@ from utilities.enums import Status
 
 
 app = Flask(__name__)
+
+app.secret_key = "my-secret-key"
 
 app.config.from_object("config")
 
@@ -67,7 +69,8 @@ def order():
                 raise ErrorHandler("Please pick a product to order.",400)
 
         except ErrorHandler as e:
-            return jsonify({"message":e.message}),e.error_code
+            flash(e.message,"danger")
+            return redirect(url_for("order",products=products))
         
         order = add_order(get_email(),Status.CREATED.name)
         database.session.commit()
@@ -77,7 +80,8 @@ def order():
 
         database.session.commit()
 
-        return jsonify({"id":order.id}),200
+        flash(f"Order with id:{order.id} is successfully created!","success")
+        return redirect(url_for("order",products=products))
 
     return render_template("order.html", products=products)
 
@@ -122,19 +126,26 @@ def delivered():
                 raise ErrorHandler("Order is already completed.",400)
 
             if order_exists.status == Status.CREATED.name:
-                raise ErrorHandler("Order is not picked up by courier be patient.")
+                raise ErrorHandler("Order is not picked up by courier be patient.",400)
 
 
         except ErrorHandler as e:
-            return jsonify({"message":e.message}),e.error_code
+            flash(e.message,"danger")
+            return redirect(url_for("delivered",orders=orders))
     
         change_status_of_order(order_exists,Status.COMPLETED.name)
 
         for order_product in order_exists.products:
             update_product_sold(order_product.product,order_product.quantity)
+        
+        flash(f"Order with id:{order_id} is successfully delivered!","success")
+        return redirect(url_for("delivered", orders=orders))
 
 
     return render_template("delivered.html",orders=orders)
 
+#TODO: Add username in the corner
+#TODO: Token expired redirect to login
+#TODO: Add Table for search method
 if __name__=="__main__":
     app.run(debug=True,host="0.0.0.0")
