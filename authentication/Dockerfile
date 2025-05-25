@@ -2,8 +2,12 @@ FROM python:3.12.2
 
 WORKDIR /usr/local/app
 
-COPY authentication .
+COPY authentication/requirements.txt .
+
 RUN pip install -r ./requirements.txt
+
+COPY authentication .
+
 
 
 

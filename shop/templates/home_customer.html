@@ -1,0 +1,42 @@
+{%extends "base_customer.html" %}
+
+
+{%block title%}Profile{%endblock%}
+
+{%block style%}
+<style>
+    body {
+        background-color: antiquewhite;
+    }
+</style> 
+
+{%endblock%}
+
+{%block content%}
+
+<div class="container d-flex justify-content-center min-vh-100 align-items-center">
+    <div class="p-4 shadow rounded" style="background-color: #fdce8c">
+         <h4 class="text-center mb-4">Profile Info</h4>
+  <div class="row row-cols-2 g-4 text-center">
+      <div class="col bg-light p-3 rounded">
+        <div class="fw-bold">First Name</div>
+        <div>{{user.first_name}}</div>
+      </div>
+      <div class="col bg-light p-3 rounded">
+        <div class="fw-bold">Last_name</div>
+        <div>{{user.last_name}}</div>
+      </div>
+      <div class="col bg-light p-3 rounded">
+        <div class="fw-bold ">Email</div>
+        <div>{{user.email}}</div>
+      </div>
+      <div class="col bg-light p-3 rounded">
+        <div class="fw-bold">Role</div>
+        <div>{{user.role}}</div>
+      </div>
+    </div>
+    </div>
+</div>
+
+{%endblock%}
+

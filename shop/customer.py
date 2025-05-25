@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, jsonify
-from flask_jwt_extended import JWTManager
+from flask import Flask, render_template, request,flash 
+from flask_jwt_extended import JWTManager, get_jwt_identity
 
 from models.models import database
 
-from utilities.utilities import ErrorHandler, get_email
+from utilities.utilities import ErrorHandler, get_email, get_user_info, expired_token, unauthorized_access, invalid_token, logout_user
 
 from utilities.databaseUtils import check_product_on_id, get_all_products, add_order,add_order_product,search_categories_on_name, search_products_on_name, update_product_waiting
 from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get_categories_by_product_id, get_quantity, get_my_order_by_id,change_status_of_order, update_product_sold
@@ -14,11 +14,26 @@ from utilities.enums import Status
 
 app = Flask(__name__)
 
+
 app.config.from_object("config")
 
 jwt = JWTManager(app)
 
 database.init_app(app)
+
+
+@app.context_processor
+def user_name():
+    identity = get_jwt_identity()
+    return {"mail":identity}
+
+
+@app.route("/", methods=["GET"])
+@customer_required()
+def profile():
+    user = get_user_info()
+    return render_template("home_customer.html",user=user)
+
 
 
 @app.route("/search",methods=["GET","POST"])
@@ -32,11 +47,7 @@ def search():
 
         categories = search_categories_on_name(search_category,search_product)
         products = search_products_on_name(search_category, search_product)
-        json_products = []
-        for product in products:
-            json_products.append({"categories":[category.name for category in product.categories],"id":product.id,"name":product.name,"price":product.price})
-
-        return jsonify({"categories":[category.name for category in categories],"products":[product for product in json_products]}),200
+        return render_template("search_results.html", categories=categories, products=products)
 
     return render_template("search.html")
 
@@ -67,7 +78,8 @@ def order():
                 raise ErrorHandler("Please pick a product to order.",400)
 
         except ErrorHandler as e:
-            return jsonify({"message":e.message}),e.error_code
+            flash(e.message,"danger")
+            return render_template("order.html", products=products)
         
         order = add_order(get_email(),Status.CREATED.name)
         database.session.commit()
@@ -77,7 +89,7 @@ def order():
 
         database.session.commit()
 
-        return jsonify({"id":order.id}),200
+        flash(f"Order with id:{order.id} is successfully created!","success")
 
     return render_template("order.html", products=products)
 
@@ -122,19 +134,41 @@ def delivered():
                 raise ErrorHandler("Order is already completed.",400)
 
             if order_exists.status == Status.CREATED.name:
-                raise ErrorHandler("Order is not picked up by courier be patient.")
+                raise ErrorHandler("Order is not picked up by courier be patient.",400)
 
 
         except ErrorHandler as e:
-            return jsonify({"message":e.message}),e.error_code
+            flash(e.message,"danger")
+            return render_template("delivered.html",orders=orders)
     
         change_status_of_order(order_exists,Status.COMPLETED.name)
 
         for order_product in order_exists.products:
             update_product_sold(order_product.product,order_product.quantity)
+        
+        flash(f"Order with id:{order_id} is successfully delivered!","success")
 
 
     return render_template("delivered.html",orders=orders)
+
+
+@app.route("/logout",methods=["POST"])
+def logout():
+    return logout_user()
+
+@jwt.expired_token_loader
+def handle_expired_token(jwt_header,jwt_payload):
+    return expired_token()
+
+@jwt.invalid_token_loader
+def handle_invalid_token(reason):
+    return invalid_token()
+
+
+@jwt.unauthorized_loader
+def unauthorized_error(reason):
+    return unauthorized_access()
+
 
 if __name__=="__main__":
     app.run(debug=True,host="0.0.0.0")

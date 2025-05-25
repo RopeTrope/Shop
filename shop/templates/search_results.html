@@ -1,0 +1,70 @@
+{%extends "base_customer.html" %}
+
+
+{%block title%}Confirm Delivery{%endblock%}
+
+{%block style%}
+<style>
+    body {
+        background-color: antiquewhite;
+    }
+</style> 
+
+{%endblock%}
+
+{%block content%}
+<div class="container d-flex justify-content-center min-vh-100 align-items-center">
+    <div class=" w-75 p-4 shadow rounded" style="background-color: #fdce8c;">
+        <table class="table table-bordered">
+            <h4 class="mb-4 text-center">Category results</h1>
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Category name</th>
+                    </tr>
+                </thead>
+            <tbody>
+                {% for category in categories %}
+                    <tr>
+                        <td>{{loop.index}}</td>
+                        <td>{{category.name}}</td>
+                    </tr>
+
+                {%endfor%}
+            </tbody>
+        </table>
+        <table class=" mt-4 table table-bordered">
+            <h4 class="mb-4 text-center">Product results</h1>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Product name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Categories</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for product in products %}
+                    <tr>
+                        <td>{{product.id}}</td>
+                        <td>{{product.name}}</td>
+                        <td>{{product.price}}</td>
+                        <td>
+                            {%for category in product.categories%}
+                                {{category.name}} |
+                            {%endfor%}
+                        </td>
+                    </tr>
+
+
+                {%endfor%}
+
+            </tbody>
+
+        </table>
+
+        </div>
+</div>
+
+{%endblock%}
+

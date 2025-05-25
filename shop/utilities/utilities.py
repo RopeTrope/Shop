@@ -3,8 +3,23 @@ from models.models import database
 from .exceptions import ErrorHandler
 import re
 
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity,get_jwt
 
+from flask import make_response, redirect, flash
+
+
+def get_user_info():
+    identity = get_jwt_identity()
+    claims = get_jwt()
+    user = {
+        "email":identity,
+        "first_name":claims.get("first_name"),
+        "last_name":claims.get("last_name"),
+        "role":claims.get("role")
+    }
+    return user
+
+LOGIN_PAGE = "http://localhost:5000/login"
 
 def file_exist(file):
     if file.filename == "":
@@ -58,3 +73,26 @@ def check_line(line_split,index):
 
 def get_email():
     return get_jwt_identity()
+
+
+def logout_user():
+    flash("Your successfully logged out.","success")
+    response = make_response(redirect(LOGIN_PAGE))
+    response.delete_cookie("access_token_cookie")
+    return response
+
+
+def expired_token():
+    flash("Your token has expired please login again.","warning")
+    response = make_response(redirect(LOGIN_PAGE))
+    response.delete_cookie("access_token_cookie")
+    return response
+
+def unauthorized_access():
+    flash("You must be logged in to access this page.","warning")
+    return redirect(LOGIN_PAGE)
+
+def invalid_token():
+    flash("Your token is not valid.","warning")
+    return redirect(LOGIN_PAGE)
+

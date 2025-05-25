@@ -11,6 +11,7 @@ with open('keys.json','r') as file:
     data = json.load(file)
     secret_key = data["SECRET_TOKEN"]
 
+SECRET_KEY = secret_key
 SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_NAME}:{DATABASE_PORT}/{DATABASE}'
 JWT_SECRET_KEY=secret_key
 JWT_ACCESS_TOKEN_EXPIRES=timedelta(hours=1)

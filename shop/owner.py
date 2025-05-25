@@ -1,14 +1,14 @@
 import os
 import time
 import requests
-from flask import Flask, Response, render_template, request, jsonify
-from flask_jwt_extended import JWTManager
+from flask import Flask, Response, render_template, request, flash
+from flask_jwt_extended import JWTManager, get_jwt_identity
 from flask_migrate import Migrate, init, upgrade, migrate, stamp
 
 from models.models import database
 
 from utilities.exceptions import ErrorHandler
-from utilities.utilities import check_line,check_extension, file_exist
+from utilities.utilities import check_line,check_extension, file_exist, get_user_info, unauthorized_access, expired_token, invalid_token, logout_user
 from utilities.databaseUtils import check_product_exist,add_product, add_category_to_product
 from utilities.decorators import owner_required
 
@@ -26,12 +26,21 @@ migration = Migrate(app,database)
 
 database.init_app(app)
 
-@app.route("/",methods=["GET"])
-@owner_required()
-def hello_owner():
-    return "<h1>Hello owner</h1>"
+@app.context_processor
+def user_name():
+    identity = get_jwt_identity()
+    return {"mail":identity}
 
-#TODO: Maybe add message when csv file is added successfully
+
+
+@app.route("/", methods=["GET"])
+@owner_required()
+def profile():
+    user = get_user_info()
+    return render_template("home_owner.html",user=user)
+
+
+
 @app.route("/update", methods=["GET","POST"])
 @owner_required()
 def update():
@@ -43,7 +52,8 @@ def update():
             #Valid extension of file
             check_extension(file)
         except ErrorHandler as e:
-            return jsonify({"message":e.message}),e.error_code
+            flash(e.message,"danger")
+            return render_template("update.html")
 
         decoded_file = file.read().decode()
         lines = decoded_file.split('\n')
@@ -56,7 +66,8 @@ def update():
                     database.session.rollback()
                     raise ErrorHandler(f"Product {name} already exists.",400)
             except ErrorHandler as e:
-                return jsonify({"message":e.message}),e.error_code
+                flash(e.message, "danger")
+                return render_template("update.html")
 
             product = add_product(name,price)
 
@@ -64,7 +75,8 @@ def update():
             for category in categories_splited:
                 add_category_to_product(category,product)
         #Commit changes to database
-        database.session.commit()            
+        database.session.commit()
+        flash("Products added sucessfully.","success")            
     return render_template("update.html")
 
 @app.route("/product_statistics")
@@ -76,6 +88,25 @@ def product_statistics():
 def category_statistics():
     response = requests.get(f"http://{SPARK_NAME}:{SPARK_PORT}/{SPARK_CATEGORY_STATISTICS_ROUTE}")
     return Response(response.text, mimetype="text/html")
+
+@app.route("/logout",methods=["POST"])
+def logout():
+    return logout_user()
+
+
+@jwt.expired_token_loader
+def handle_expired_token(jwt_header,jwt_payload):
+    return expired_token()
+
+@jwt.invalid_token_loader
+def handle_invalid_token(reason):
+    return invalid_token()
+
+
+@jwt.unauthorized_loader
+def unauthorized_error(reason):
+    return unauthorized_access()
+
 
 
 migration_path = os.path.join(os.getcwd(),'migrations')
