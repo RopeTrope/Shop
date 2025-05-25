@@ -83,7 +83,7 @@ services:
     ports:
         - 5200:5000
     depends_on:
-      - owner
+      - db_shop
     environment:
       - FLASK_APP=customer.py
     networks:
@@ -95,7 +95,7 @@ services:
     ports:
         - 5300:5000
     depends_on:
-      - owner
+      - db_shop
     environment:
       - FLASK_APP=courier.py
     networks:

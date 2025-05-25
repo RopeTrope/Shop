@@ -3,7 +3,7 @@ from flask_jwt_extended import JWTManager, get_jwt_identity
 
 from models.models import database
 
-from utilities.utilities import ErrorHandler, get_email, get_user_info, expired_token, unauthorized_access, invalid_token
+from utilities.utilities import ErrorHandler, get_email, get_user_info, expired_token, unauthorized_access, invalid_token, logout_user
 
 from utilities.databaseUtils import check_product_on_id, get_all_products, add_order,add_order_product,search_categories_on_name, search_products_on_name, update_product_waiting
 from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get_categories_by_product_id, get_quantity, get_my_order_by_id,change_status_of_order, update_product_sold
@@ -14,7 +14,6 @@ from utilities.enums import Status
 
 app = Flask(__name__)
 
-app.secret_key = "my-secret-key"
 
 app.config.from_object("config")
 
@@ -153,10 +152,13 @@ def delivered():
     return render_template("delivered.html",orders=orders)
 
 
+@app.route("/logout",methods=["POST"])
+def logout():
+    return logout_user()
+
 @jwt.expired_token_loader
 def handle_expired_token(jwt_header,jwt_payload):
-    response = expired_token()
-    return response
+    return expired_token()
 
 @jwt.invalid_token_loader
 def handle_invalid_token(reason):

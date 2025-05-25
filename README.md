@@ -32,6 +32,9 @@ This project can be simply runned using command:
 docker compose up --build
 
 
+To stop services docker compose down, docker compose -f .\spark\spark.yaml down
+
+
 
 
 

@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import flash, redirect, request
+from flask import flash, redirect
 from flask_jwt_extended import jwt_required, get_jwt
 from .enums import Role
 from .utilities import LOGIN_PAGE

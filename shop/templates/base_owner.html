@@ -43,6 +43,9 @@
                     </li>
                 </ul>
                 <span class="ms-auto navbar-text">{{mail}}</span>
+                <form action="{{ url_for("logout")}}" method="post">
+                    <button class="btn btn-outline-danger">Logout</button>
+                </form>
                 </div>
             </div>
             </nav>

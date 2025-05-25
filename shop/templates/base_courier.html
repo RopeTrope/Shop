@@ -39,7 +39,12 @@
                     <a class="nav-link" href="{{url_for('pick_up_order')}}">Pick up order</a>
                     </li>
                 </ul>
-                <span class="ms-auto navbar-text">{{mail}}</span>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <span class="navbar-text">{{mail}}</span>
+                    <form action="{{ url_for("logout")}}" method="post">
+                        <button class="btn btn-outline-danger">Logout</button>
+                    </form>
+                </div>
                 </div>
             </div>
             </nav>

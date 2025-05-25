@@ -75,6 +75,12 @@ def get_email():
     return get_jwt_identity()
 
 
+def logout_user():
+    flash("Your successfully logged out.","success")
+    response = make_response(redirect(LOGIN_PAGE))
+    response.delete_cookie("access_token_cookie")
+    return response
+
 
 def expired_token():
     flash("Your token has expired please login again.","warning")

@@ -17,8 +17,6 @@ import time
 
 
 app = Flask(__name__)
-#TODO: Move this
-app.secret_key = "my-secret-key"
 app.config.from_object("config")
 jwt = JWTManager(app)
 migration = Migrate(app,database)
@@ -170,7 +168,6 @@ def create_db_and_run_migrations():
         upgrade(directory=migration_path)
         create_owners()
 
-#TODO: Add logout
 if __name__ == "__main__":
     create_db_and_run_migrations()
     app.run(debug=True, host="0.0.0.0")

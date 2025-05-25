@@ -18,4 +18,8 @@ just_database.yaml
 
 shop.yaml
 
-*.ps1
+run_authen.ps1
+
+run_one_shop.ps1
+
+run_shop.ps1

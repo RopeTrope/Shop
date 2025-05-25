@@ -71,5 +71,3 @@ def go_to_profile(role):
         return HOME_COURIER
     if role == "Owner":
         return HOME_OWNER
-
-    

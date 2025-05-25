@@ -3,7 +3,7 @@ from flask_jwt_extended import JWTManager, get_jwt_identity
 from models.models import database
 
 
-from utilities.utilities import get_user_info, unauthorized_access, expired_token, invalid_token
+from utilities.utilities import get_user_info, unauthorized_access, expired_token, invalid_token, logout_user
 from utilities.decorators import courier_required
 from utilities.databaseUtils import get_all_not_taken_orders, get_order_only_by_id, change_status_of_order
 from utilities.enums import Status
@@ -12,8 +12,6 @@ from utilities.exceptions import ErrorHandler
 
 
 app = Flask(__name__)
-
-app.secret_key = "my-secret-key"
 
 app.config.from_object("config")
 
@@ -69,11 +67,15 @@ def pick_up_order():
         flash(f"Order with id:{order_id} is picked successfully! Please refresh the page.","success")
         
     return render_template("pick_up_order.html",orders=orders)
-    
+
+@app.route("/logout",methods=["POST"])
+def logout():
+    return logout_user()
+
+
 @jwt.expired_token_loader
 def handle_expired_token(jwt_header,jwt_payload):
-    response = expired_token()
-    return response
+    return expired_token()
 
 @jwt.invalid_token_loader
 def handle_invalid_token(reason):

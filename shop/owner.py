@@ -8,7 +8,7 @@ from flask_migrate import Migrate, init, upgrade, migrate, stamp
 from models.models import database
 
 from utilities.exceptions import ErrorHandler
-from utilities.utilities import check_line,check_extension, file_exist, get_user_info, unauthorized_access, expired_token, invalid_token
+from utilities.utilities import check_line,check_extension, file_exist, get_user_info, unauthorized_access, expired_token, invalid_token, logout_user
 from utilities.databaseUtils import check_product_exist,add_product, add_category_to_product
 from utilities.decorators import owner_required
 
@@ -17,8 +17,6 @@ from config import SPARK_NAME, SPARK_PORT, SPARK_PRODUCT_STATISTICS_ROUTE, SPARK
 from sqlalchemy.exc import OperationalError
 
 app = Flask(__name__)
-
-app.secret_key = "my-secret-key"
 
 app.config.from_object("config")
 
@@ -91,10 +89,14 @@ def category_statistics():
     response = requests.get(f"http://{SPARK_NAME}:{SPARK_PORT}/{SPARK_CATEGORY_STATISTICS_ROUTE}")
     return Response(response.text, mimetype="text/html")
 
+@app.route("/logout",methods=["POST"])
+def logout():
+    return logout_user()
+
+
 @jwt.expired_token_loader
 def handle_expired_token(jwt_header,jwt_payload):
-    response = expired_token()
-    return response
+    return expired_token()
 
 @jwt.invalid_token_loader
 def handle_invalid_token(reason):
