@@ -10,6 +10,12 @@ class Role(Enum):
     Courier = 3
 
 
+
+HOME_CUSTOMER = "http://localhost:5200"
+HOME_OWNER = "http://localhost:5100"
+HOME_COURIER = "http://localhost:5300"
+
+
 def validation(fname,lname,email,password):
 
     if fname is None or lname is None or email is None or password is None:
@@ -56,3 +62,14 @@ def hashing_password(password):
 
 def check_hash_password(password,hashed_password):
     return bcrypt.checkpw(password.encode("utf-8"),hashed_password.encode("utf-8"))
+
+
+def go_to_profile(role):
+    if role == "Customer":
+        return HOME_CUSTOMER
+    if role == "Courier":
+        return HOME_COURIER
+    if role == "Owner":
+        return HOME_OWNER
+
+    

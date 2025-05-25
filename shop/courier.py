@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, flash
 from flask_jwt_extended import JWTManager, get_jwt_identity
 from models.models import database
 
 
+from utilities.utilities import get_user_info
 from utilities.decorators import courier_required
 from utilities.databaseUtils import get_all_not_taken_orders, get_order_only_by_id, change_status_of_order
 from utilities.enums import Status
@@ -23,7 +24,16 @@ database.init_app(app)
 @app.context_processor
 def user_name():
     identity = get_jwt_identity()
-    return {"user":identity}
+    return {"mail":identity}
+
+
+@app.route("/", methods=["GET"])
+@courier_required()
+def profile():
+    user = get_user_info()
+    return render_template("home_courier.html",user=user)
+
+
 
 
 
@@ -56,7 +66,7 @@ def pick_up_order():
             return render_template("pick_up_order.html",orders=orders)
         
         change_status_of_order(order_exists,Status.PENDING.name)
-        flash(f"Order with id:{order_id} is picked successfully!","success")
+        flash(f"Order with id:{order_id} is picked successfully! Please refresh the page.","success")
         
     return render_template("pick_up_order.html",orders=orders)
     

@@ -30,13 +30,16 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
+                    <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+                    </li>
+                    <li class="nav-item">
                     <a class="nav-link" href="{{url_for('orders_to_deliver')}}">Orders to deliver</a>
                     </li>
                     <li class="nav-item">
                     <a class="nav-link" href="{{url_for('pick_up_order')}}">Pick up order</a>
                     </li>
                 </ul>
-                <span class="ms-auto navbar-text">{%block user%} {{user}} {%endblock%}</span>
+                <span class="ms-auto navbar-text">{{mail}}</span>
                 </div>
             </div>
             </nav>

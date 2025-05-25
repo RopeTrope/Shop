@@ -6,6 +6,7 @@ COPY ./shop/requirements.txt .
 COPY ./shop/customer.py .
 COPY ./shop/keys.json .
 COPY ./shop/models ./models
+COPY ./shop/templates/home_customer.html ./templates/home_customer.html
 COPY ./shop/templates/base_customer.html ./templates/base_customer.html
 COPY ./shop/templates/search.html ./templates/search.html
 COPY ./shop/templates/search_results.html ./templates/search_results.html

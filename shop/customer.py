@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, jsonify,redirect,flash, url_for
+from flask import Flask, render_template, request,flash 
 from flask_jwt_extended import JWTManager, get_jwt_identity
 
 from models.models import database
 
-from utilities.utilities import ErrorHandler, get_email
+from utilities.utilities import ErrorHandler, get_email, get_user_info
 
 from utilities.databaseUtils import check_product_on_id, get_all_products, add_order,add_order_product,search_categories_on_name, search_products_on_name, update_product_waiting
 from utilities.databaseUtils import get_my_orders, get_products_by_order_id, get_categories_by_product_id, get_quantity, get_my_order_by_id,change_status_of_order, update_product_sold
@@ -26,7 +26,14 @@ database.init_app(app)
 @app.context_processor
 def user_name():
     identity = get_jwt_identity()
-    return {"user":identity}
+    return {"mail":identity}
+
+
+@app.route("/", methods=["GET"])
+@customer_required()
+def profile():
+    user = get_user_info()
+    return render_template("home_customer.html",user=user)
 
 
 

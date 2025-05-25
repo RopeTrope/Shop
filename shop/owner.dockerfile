@@ -8,6 +8,7 @@ COPY ./shop/keys.json .
 COPY ./shop/models ./models
 COPY  ./shop/templates/base_owner.html ./templates/base_owner.html
 COPY ./shop/templates/update.html ./templates/update.html
+COPY ./shop/templates/home_owner.html ./templates/home_owner.html
 COPY ./shop/config.py .
 COPY ./shop/utilities ./utilities
 

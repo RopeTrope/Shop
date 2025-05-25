@@ -8,7 +8,7 @@ from flask_migrate import Migrate, init, upgrade, migrate, stamp
 from models.models import database
 
 from utilities.exceptions import ErrorHandler
-from utilities.utilities import check_line,check_extension, file_exist
+from utilities.utilities import check_line,check_extension, file_exist, get_user_info
 from utilities.databaseUtils import check_product_exist,add_product, add_category_to_product
 from utilities.decorators import owner_required
 
@@ -31,14 +31,17 @@ database.init_app(app)
 @app.context_processor
 def user_name():
     identity = get_jwt_identity()
-    return {"user":identity}
+    return {"mail":identity}
 
 
 
-@app.route("/",methods=["GET"])
+@app.route("/", methods=["GET"])
 @owner_required()
-def hello_owner():
-    return "<h1>Hello owner</h1>"
+def profile():
+    user = get_user_info()
+    return render_template("home_owner.html",user=user)
+
+
 
 @app.route("/update", methods=["GET","POST"])
 @owner_required()

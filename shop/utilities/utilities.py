@@ -3,7 +3,19 @@ from models.models import database
 from .exceptions import ErrorHandler
 import re
 
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity,get_jwt
+
+
+def get_user_info():
+    identity = get_jwt_identity()
+    claims = get_jwt()
+    user = {
+        "email":identity,
+        "first_name":claims.get("first_name"),
+        "last_name":claims.get("last_name"),
+        "role":claims.get("role")
+    }
+    return user
 
 
 def file_exist(file):

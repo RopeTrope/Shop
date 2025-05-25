@@ -8,7 +8,7 @@ from flask_migrate import Migrate, init, upgrade, migrate, stamp
 from sqlalchemy.exc import OperationalError
 from models.models import database
 
-from utilities.utilities import validation, login_validation, check_hash_password, Role
+from utilities.utilities import validation, login_validation, check_hash_password, Role, go_to_profile
 from utilities.databaseUtils import find_user_by_email, add_user_to_db, delete_user, create_owners
 import os
 import time
@@ -25,12 +25,6 @@ migration = Migrate(app,database)
 database.init_app(app)
 migration.init_app(app,database)
 
-
-@app.route("/hello",methods=['GET'])
-@jwt_required()
-def forbidden():
-    ident = get_jwt_identity()
-    return f"Hello {ident} to forbidden page"
 
 @app.route("/register_customer",methods=["GET","POST"])
 def register_customer():
@@ -111,7 +105,8 @@ def login():
             "role":user_exists.role
                    }
         token = create_access_token(identity=email, additional_claims=claims)
-        response = make_response(redirect("/hello"))
+        route = go_to_profile(user_exists.role)
+        response = make_response(redirect(route))
         set_access_cookies(response,token)
         return response
     
