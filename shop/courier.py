@@ -3,7 +3,7 @@ from flask_jwt_extended import JWTManager, get_jwt_identity
 from models.models import database
 
 
-from utilities.utilities import get_user_info
+from utilities.utilities import get_user_info, unauthorized_access, expired_token, invalid_token
 from utilities.decorators import courier_required
 from utilities.databaseUtils import get_all_not_taken_orders, get_order_only_by_id, change_status_of_order
 from utilities.enums import Status
@@ -70,8 +70,21 @@ def pick_up_order():
         
     return render_template("pick_up_order.html",orders=orders)
     
+@jwt.expired_token_loader
+def handle_expired_token(jwt_header,jwt_payload):
+    response = expired_token()
+    return response
+
+@jwt.invalid_token_loader
+def handle_invalid_token(reason):
+    return invalid_token()
+
+
+@jwt.unauthorized_loader
+def unauthorized_error(reason):
+    return unauthorized_access()
+
 
 #TODO: README update
-#TODO: Update html pages 
 if __name__=="__main__":
     app.run(debug=True,host="0.0.0.0")

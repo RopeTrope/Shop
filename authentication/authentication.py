@@ -145,7 +145,7 @@ def handle_invalid_token(reason):
 
 @jwt.unauthorized_loader
 def unauthorized_error(reason):
-    flash("You must be logged in to access this page.","warning")
+    flash("Sorry you are not authorized to access this page.","warning")
     return redirect("/login")
 
 
@@ -171,7 +171,6 @@ def create_db_and_run_migrations():
         create_owners()
 
 #TODO: Add logout
-#TODO: Add home for all types of users html
 if __name__ == "__main__":
     create_db_and_run_migrations()
     app.run(debug=True, host="0.0.0.0")
