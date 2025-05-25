@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify,redirect,flash, url_for
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, get_jwt_identity
 
 from models.models import database
 
@@ -23,6 +23,13 @@ jwt = JWTManager(app)
 database.init_app(app)
 
 
+@app.context_processor
+def user_name():
+    identity = get_jwt_identity()
+    return {"user":identity}
+
+
+
 @app.route("/search",methods=["GET","POST"])
 @customer_required()
 def search():
@@ -34,11 +41,7 @@ def search():
 
         categories = search_categories_on_name(search_category,search_product)
         products = search_products_on_name(search_category, search_product)
-        json_products = []
-        for product in products:
-            json_products.append({"categories":[category.name for category in product.categories],"id":product.id,"name":product.name,"price":product.price})
-
-        return jsonify({"categories":[category.name for category in categories],"products":[product for product in json_products]}),200
+        return render_template("search_results.html", categories=categories, products=products)
 
     return render_template("search.html")
 
@@ -70,7 +73,7 @@ def order():
 
         except ErrorHandler as e:
             flash(e.message,"danger")
-            return redirect(url_for("order",products=products))
+            return render_template("order.html", products=products)
         
         order = add_order(get_email(),Status.CREATED.name)
         database.session.commit()
@@ -81,7 +84,6 @@ def order():
         database.session.commit()
 
         flash(f"Order with id:{order.id} is successfully created!","success")
-        return redirect(url_for("order",products=products))
 
     return render_template("order.html", products=products)
 
@@ -131,7 +133,7 @@ def delivered():
 
         except ErrorHandler as e:
             flash(e.message,"danger")
-            return redirect(url_for("delivered",orders=orders))
+            return render_template("delivered.html",orders=orders)
     
         change_status_of_order(order_exists,Status.COMPLETED.name)
 
@@ -139,13 +141,11 @@ def delivered():
             update_product_sold(order_product.product,order_product.quantity)
         
         flash(f"Order with id:{order_id} is successfully delivered!","success")
-        return redirect(url_for("delivered", orders=orders))
 
 
     return render_template("delivered.html",orders=orders)
 
-#TODO: Add username in the corner
+
 #TODO: Token expired redirect to login
-#TODO: Add Table for search method
 if __name__=="__main__":
     app.run(debug=True,host="0.0.0.0")

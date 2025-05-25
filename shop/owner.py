@@ -1,8 +1,8 @@
 import os
 import time
 import requests
-from flask import Flask, Response, render_template, request, jsonify, flash
-from flask_jwt_extended import JWTManager
+from flask import Flask, Response, render_template, request, flash
+from flask_jwt_extended import JWTManager, get_jwt_identity
 from flask_migrate import Migrate, init, upgrade, migrate, stamp
 
 from models.models import database
@@ -27,6 +27,13 @@ jwt = JWTManager(app)
 migration = Migrate(app,database)
 
 database.init_app(app)
+
+@app.context_processor
+def user_name():
+    identity = get_jwt_identity()
+    return {"user":identity}
+
+
 
 @app.route("/",methods=["GET"])
 @owner_required()

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, flash
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, get_jwt_identity
 from models.models import database
 
 
@@ -19,6 +19,14 @@ app.config.from_object("config")
 jwt = JWTManager(app)
 
 database.init_app(app)
+
+@app.context_processor
+def user_name():
+    identity = get_jwt_identity()
+    return {"user":identity}
+
+
+
 
 @app.route("/orders_to_deliver",methods=["GET"])
 @courier_required()
@@ -45,7 +53,7 @@ def pick_up_order():
             
         except ErrorHandler as e:
             flash(e.message,"danger")
-            return redirect("/pick_up_order",orders=orders)
+            return render_template("pick_up_order.html",orders=orders)
         
         change_status_of_order(order_exists,Status.PENDING.name)
         flash(f"Order with id:{order_id} is picked successfully!","success")

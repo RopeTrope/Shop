@@ -25,9 +25,6 @@ migration = Migrate(app,database)
 database.init_app(app)
 migration.init_app(app,database)
 
-@app.route("/",methods=['GET'])
-def hello():
-    return render_template("index.html")
 
 @app.route("/hello",methods=['GET'])
 @jwt_required()
