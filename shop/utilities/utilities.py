@@ -89,7 +89,7 @@ def expired_token():
     return response
 
 def unauthorized_access():
-    flash("You must be logged in to access this page.","warning")
+    flash("Unauthorized access. Cannot access this route.","warning")
     return redirect(LOGIN_PAGE)
 
 def invalid_token():

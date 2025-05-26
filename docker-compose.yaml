@@ -6,6 +6,7 @@ services:
     image: adminer
     ports:
         - 8080:8080
+    cpus: 0.2
     networks:
       - authen
         
@@ -13,6 +14,7 @@ services:
     image: adminer
     ports:
         - 8090:8080
+    cpus: 0.2
     networks:
       - shop
 
@@ -25,6 +27,7 @@ services:
         MYSQL_PASSWORD: user
     volumes:
       - mysql-data:/var/lib/mysql
+    cpus: 0.3
     ports:
         - 3306:3306
     networks:
@@ -39,6 +42,7 @@ services:
         MYSQL_PASSWORD: user
     volumes:
       - mysql-data-shop:/var/lib/mysql
+    cpus: 0.3
     ports:
         - 3360:3306
     networks:
@@ -56,6 +60,7 @@ services:
       - migrations-data:/usr/local/app/migrations
     depends_on:
         - db
+    cpus: 0.4
     environment:
       - FLASK_ENV=development
       - FLASK_APP=authentication.py
@@ -71,6 +76,7 @@ services:
       - migrations-data-shop:/usr/local/app/migrations
     depends_on:
       - db_shop  
+    cpus: 0.4
     environment:
       - FLASK_APP=owner.py
     networks:
@@ -84,6 +90,7 @@ services:
         - 5200:5000
     depends_on:
       - db_shop
+    cpus: 0.4
     environment:
       - FLASK_APP=customer.py
     networks:
@@ -96,6 +103,7 @@ services:
         - 5300:5000
     depends_on:
       - db_shop
+    cpus: 0.4
     environment:
       - FLASK_APP=courier.py
     networks:
