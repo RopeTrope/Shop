@@ -86,7 +86,5 @@ def handle_invalid_token(reason):
 def unauthorized_error(reason):
     return unauthorized_access()
 
-
-#TODO: README update
 if __name__=="__main__":
     app.run(debug=True,host="0.0.0.0")
